@@ -67,7 +67,7 @@ touch:
 	touch $(GOAL)
 
 clean:
-	$(RM) $(OBJS) *.d $(GOAL) $(GOALLIB)
+	$(RM) -f $(OBJS) *.d $(GOAL) $(GOALLIB)
 
 docs:
 	@(cd doc ; $(MAKE))

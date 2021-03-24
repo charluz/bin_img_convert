@@ -64,7 +64,7 @@ $(GOAL): $(OBJS)
 .PHONY: clean check docs $(GOAL)
 
 clean:
-	$(RM) $(OBJS) $(GOAL) $(GOALLIB)
+	$(RM) -f $(OBJS) $(GOAL) $(GOALLIB)
 
 docs:
 	@(cd doc ; $(MAKE))
