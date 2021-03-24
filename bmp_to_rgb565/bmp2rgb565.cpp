@@ -77,8 +77,15 @@ static void _reform_output_image(FILE *fd, char *pbmp, unsigned hsize, unsigned 
 			g = *prgb++;
 			r = *prgb;
 
-			rawdat[1] = (r & (~0x07)) | ((g & 0xE0) >> 5);	// r5[7:3] g3[7:5]
 			rawdat[0] = ((g & 0x1C) << 3) | ((b & 0xF8) >> 3);	// g3[4:2], b5[7:3]
+			rawdat[1] = (r & (~0x07)) | ((g & 0xE0) >> 5);	// r5[7:3] g3[7:5]
+
+#if 1
+			if (row==vsize-1 && col==0) {
+				printf("rawdat: [0]= %02x, [1]= %02x\n", rawdat[0] & 0xFF, rawdat[1] & 0xFF);
+			}
+#endif
+
 			fwrite(rawdat, sizeof(char), 2, fd);
 		}
 	}
