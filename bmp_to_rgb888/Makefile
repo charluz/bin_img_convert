@@ -30,21 +30,24 @@ OBJS = $(C_OBJS) $(CPP_OBJS)
 
 INC_FLAGS	= -I. -I$(INC_DIR)
 
-CFLAGS	= -O2 -Wall -Wno-maybe-uninitialized
-CFLAGS += $(INC_FLAGS)
+CFLAGS	= -O2 -Wall
+CFLAGS	+= -Wno-maybe-uninitialized -Wno-sign-compare
+CFLAGS	+= -Wno-format -Wno-strict-aliasing
+CFLAGS	+= -Wno-write-string -Wno-unused-result
+CFLAGS	+= -Wno-unused-variable -Wno-unused-but-set-variable
+CFLAGS	+= $(INC_FLAGS)
 
 %.o: %.c
 	@(echo "[C] Compiling $< ...")
 	@$(CC) -MM -MF $(@:.o=.d)  -std=c99 $(CFLAGS) $<
-	$(cc) $(CFLAGS) -o $@ $<
+	@$(cc) $(CFLAGS) -o $@ $<
 
 
 %o:%cpp
 	@(echo "")
 	@(echo "[CXX] Compiling $< ...")
-	$(CXX) -MM -MF $(@:.o=.d) $(CFLAGS) $<
-	$(CXX) $(CFLAGS) -c -o $@ $<
-	@(echo "")
+	@$(CXX) -MM -MF $(@:.o=.d) $(CFLAGS) $<
+	@$(CXX) $(CFLAGS) -c -o $@ $<
 
 all: $(GOAL)
 

@@ -28,7 +28,6 @@ volatile uint32_t term_sig = 0;
 
 char* prepare_file_name(char *fin, char *oext, char *post)
 {
-	int i;
 	static std::string filename = fin;
 
 	//remove path

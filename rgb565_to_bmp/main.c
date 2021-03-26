@@ -108,22 +108,21 @@ int main(int argc, char *argv[])
 	wsize = 3 * (fsize / 2);	// rgb565(2 bytes) --> BGR(3 bytes)
 	pdstsave =(char *)malloc(wsize);
 
-	for(int row=height-1; row>=0; row--)  {
+	//--- bin2bmp function will store the image up-side donw, and
+	// use BGR format, leave it to bin2bmp function !!
+	for(int row=0; row<height; row++)  {
 		pdstbuf = pdstsave + (row * width * 3);
 		for (int col=0; col<width; col++) {
 			char r, g, b;
 			unsigned color565;
 
-			// color565 = ((unsigned)*psrcbuf++)<<8;
-			// color565 += (((unsigned)*psrcbuf++) & 0xFFu);
-
 			//-- for kneron rgb565 -- gb:rg
 			color565 = ((unsigned)psrcbuf[1])<<8;
 			color565 += (((unsigned)psrcbuf[0]) & 0xFFu);
 
-			if (row==height-1 && col==0) {
-				printf("[0]= %02x, [1]= %02x -- color565= %04x\n", psrcbuf[0] & 0xFF, psrcbuf[1] & 0xFF, color565 & 0xFFFF);
-			}
+			// if (row==height-1 && col==0) {
+			// 	printf("[0]= %02x, [1]= %02x -- color565= %04x\n", psrcbuf[0] & 0xFF, psrcbuf[1] & 0xFF, color565 & 0xFFFF);
+			// }
 
 			//獲取高位元組的5個bit
 			r = (char)((color565 & 0xF800)>>(8));
@@ -134,9 +133,9 @@ int main(int argc, char *argv[])
 
 			psrcbuf += 2;
 			//-- BMP 是 BGR 排列
-			*pdstbuf++ = b;
-			*pdstbuf++ = g;
 			*pdstbuf++ = r;
+			*pdstbuf++ = g;
+			*pdstbuf++ = b;
 		}
 	}
 #if 0

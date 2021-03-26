@@ -37,7 +37,7 @@ void bitmap(char *pfbmp, unsigned int width, unsigned height, char *prgb)
 	// prgb				: the RGB binary of the image array
 
 	/* Magic number for file. It does not fit in the header structure due to alignment requirements, so put it outside */
-	unsigned short bfType=0x4d42;		   
+	unsigned short bfType=0x4d42;
 	bfh.bfReserved1 = 0;
 	bfh.bfReserved2 = 0;
 	bfh.bfSize = 2+sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER)+width*height*3;
@@ -67,19 +67,24 @@ void bitmap(char *pfbmp, unsigned int width, unsigned height, char *prgb)
 	fwrite(&bih, 1, sizeof(bih), file);
 
 	/*Write bitmap*/
-	fwrite(prgb, sizeof(char), bih.biWidth*bih.biHeight*3, file);
-	// for (int y = bih.biHeight-1; y>=0; y--) { 
-	// 	/*Scanline loop backwards*/ 
-	// 	for (int x = 0; x < bih.biWidth; x++) { 
-	// 		/*Column loop forwards*/ 
-	// 		/*compute some pixel values*/
-	// 		unsigned char r = *prgb++;
-	// 		unsigned char g = *prgb++;
-	// 		unsigned char b = *prgb++;
-	// 		fwrite(&b, 1, 1, file);
-	// 		fwrite(&g, 1, 1, file);
-	// 		fwrite(&r, 1, 1, file);
-	// 	}
-	// }
+	//-----------------------------------------------------------
+	// DO NOT use bulk write, might encouter endian problem
+	//-----------------------------------------------------------
+	// fwrite(prgb, sizeof(char), bih.biWidth*bih.biHeight*3, file);
+	// BMP 是 Flip 但沒有 mirror 儲存的, 排列是 BGR
+	for (int y = bih.biHeight-1; y>=0; y--) {
+		/*Scanline loop backwards*/
+		unsigned char *p = prgb + (y * bih.biWidth * 3);
+		for (int x = 0; x < bih.biWidth; x++) {
+			/*Column loop forwards*/
+			/*compute some pixel values*/
+			unsigned char r = *p++;
+			unsigned char g = *p++;
+			unsigned char b = *p++;
+			fwrite(&b, 1, 1, file);
+			fwrite(&g, 1, 1, file);
+			fwrite(&r, 1, 1, file);
+		}
+	}
 	fclose(file);
 }
