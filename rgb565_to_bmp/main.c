@@ -33,7 +33,7 @@ static void _print_prog_usage(char *psz_prog_name)
 {
 	printf("\n");
 	printf("Usage:\n");
-	printf("\t%s W H BMP\n",  psz_prog_name);
+	printf("\t%s W H IMG565\n",  psz_prog_name);
 	printf("Descriptions:\n");
 	printf("\tConvert rgb565-image to bmp-image ...\n");
 	printf("\t\tW, H : the resolution of input BIN image.\n");

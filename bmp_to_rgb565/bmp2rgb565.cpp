@@ -3,10 +3,11 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/time.h>
+
+#include "common.h"
+
 #include <stdarg.h>			/*for valist */
 #include <iostream>			/*for std*/
-#include "common.h"
-// #include "user_util.h"
 
 /*---------------------------------------------------------------------
  * Constants

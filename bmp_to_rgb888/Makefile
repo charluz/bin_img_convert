@@ -38,16 +38,17 @@ CFLAGS	+= -Wno-unused-variable -Wno-unused-but-set-variable
 CFLAGS	+= $(INC_FLAGS)
 
 %.o: %.c
+	@(echo "")
 	@(echo "[C] Compiling $< ...")
 	@$(CC) -MM -MF $(@:.o=.d)  -std=c99 $(CFLAGS) $<
-	@$(cc) $(CFLAGS) -o $@ $<
+	@$(cc) $(CFLAGS) -c $< -o $@
 
 
-%o:%cpp
+%.o:%.cpp
 	@(echo "")
 	@(echo "[CXX] Compiling $< ...")
 	@$(CXX) -MM -MF $(@:.o=.d) $(CFLAGS) $<
-	@$(CXX) $(CFLAGS) -c -o $@ $<
+	@$(CXX) $(CFLAGS) -c $< -o $@
 
 all: $(GOAL)
 
