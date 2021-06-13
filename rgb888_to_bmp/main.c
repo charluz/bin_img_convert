@@ -33,11 +33,11 @@ static void _print_prog_usage(char *psz_prog_name)
 {
 	printf("\n");
 	printf("Usage:\n");
-	printf("\t%s IMG565 W H\n",  psz_prog_name);
+	printf("\t%s IMG888 W H\n",  psz_prog_name);
 	printf("Descriptions:\n");
-	printf("\tConvert rgb565-image to bmp-image ...\n");
-	printf("\t\tIMG565: the input RGB565 file.\n");
+	printf("\tConvert rgb888-image to bmp-image ...\n");
 	printf("\t\tW, H : the resolution of input BIN image.\n");
+	printf("\t\tIMG888 : the input RGB888 file.\n");
 }
 
 /*---------------------------------------------------------------------
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 	fsize = ftell(fd_src);
 
 	pbufsave = psrcbuf = (char *)malloc(fsize);
-	//printf("SRC[%s] size : %d\n", psz_fnsrc, fsize);
+	printf("SRC[%s] size : %d\n", psz_fnsrc, fsize);
 
 	if (!psrcbuf) {
 		printf("Error: insufficient memory!!\n");
@@ -103,9 +103,9 @@ int main(int argc, char *argv[])
 		goto _exit;
 	}
 
-	// printf("Converting %d x %d...\n", width, height);
+	printf("Converting %d x %d...\n", width, height);
 
-	wsize = 3 * (fsize / 2);	// rgb565(2 bytes) --> BGR(3 bytes)
+	wsize = fsize; // 3 * (fsize / 2);	// rgb888(3 bytes) --> BGR(3 bytes)
 	pdstsave =(char *)malloc(wsize);
 
 	//--- bin2bmp function will store the image up-side donw, and
@@ -114,24 +114,11 @@ int main(int argc, char *argv[])
 		pdstbuf = pdstsave + (row * width * 3);
 		for (int col=0; col<width; col++) {
 			char r, g, b;
-			unsigned color565;
 
-			//-- for kneron rgb565 -- gb:rg
-			color565 = ((unsigned)psrcbuf[1])<<8;
-			color565 += (((unsigned)psrcbuf[0]) & 0xFFu);
+			r = (char)*psrcbuf++;
+			g = (char)*psrcbuf++;
+			b = (char)*psrcbuf++;
 
-			// if (row==height-1 && col==0) {
-			// 	printf("[0]= %02x, [1]= %02x -- color565= %04x\n", psrcbuf[0] & 0xFF, psrcbuf[1] & 0xFF, color565 & 0xFFFF);
-			// }
-
-			//獲取高位元組的5個bit
-			r = (char)((color565 & 0xF800)>>(8));
-			//獲取中間6個bit
-			g = (char)((color565 & 0x07E0)>>(3));
-			//獲取低位元組5個bit
-			b = (char)((color565 & 0x001F)<<3);
-
-			psrcbuf += 2;
 			//-- BMP 是 BGR 排列
 			*pdstbuf++ = r;
 			*pdstbuf++ = g;

@@ -18,7 +18,7 @@ INC_DIR		= ../common
 EXEC_DIR	= ../exec
 
 #=== Project programs
-GOAL = rgb565_to_bmp
+GOAL = rgb888_to_bmp
 
 C_SRCS = main.c bin2bmp.c
 CPP_SRCS = $(INC_DIR)/common.cpp
@@ -44,12 +44,12 @@ CFLAGS	+= $(INC_FLAGS)
 %.o:%.c
 	@(echo "")
 	@(echo "[C] Compiling $< ...")
-	@$(CC) $(CFLAGS) -std=c99 -c -o $@ $<
+	@$(CC) $(CFLAGS) -std=c99 -c $< -o $@
 
 %.o:%.cpp
 	@(echo "")
 	@(echo "[CXX] Compiling $< ...")
-	@$(CC) $(CFLAGS) -c -o $@ $<
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 
 all: $(GOAL)
