@@ -30,6 +30,13 @@ make -C bmp_to_rgb888 install || exit 1
 
 
 echo '**********************************'
+echo 'Building bmp_to_gray '
+echo '**********************************'
+make -C bmp_to_gray clean && make -C bmp_to_gray all
+make -C bmp_to_gray install || exit 1
+
+
+echo '**********************************'
 echo 'Building rgb565_to_rgb888 '
 echo '**********************************'
 make -C rgb565_to_rgb888 clean && make -C rgb565_to_rgb888 all

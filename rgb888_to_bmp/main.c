@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 			g = (char)*psrcbuf++;
 			b = (char)*psrcbuf++;
 
-			//-- BMP 是 BGR 排列
+			//-- BMP 是 BGR 排列, leave it to bin2bmp function !!
 			*pdstbuf++ = r;
 			*pdstbuf++ = g;
 			*pdstbuf++ = b;
