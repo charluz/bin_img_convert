@@ -37,7 +37,7 @@ CFLAGS	+= -Wno-write-string -Wno-unused-result
 CFLAGS	+= -Wno-unused-variable -Wno-unused-but-set-variable
 CFLAGS	+= $(INC_FLAGS)
 
-%.o: %.c
+%.o:%.c
 	@(echo "[C] Compiling $< ...")
 	@$(CC) -MM -MF $(@:.o=.d)  -std=c99 $(CFLAGS) $<
 	@$(cc) $(CFLAGS) -o $@ $<
@@ -47,14 +47,14 @@ CFLAGS	+= $(INC_FLAGS)
 	@(echo "")
 	@(echo "[CXX] Compiling $< ...")
 	@$(CXX) -MM -MF $(@:.o=.d) $(CFLAGS) $<
-	@$(CXX) $(CFLAGS) -c -o $@ $<
+	$(CXX) $(CFLAGS) -I../common -c -o $@ $<
 
 all: $(GOAL)
 
 $(GOAL): $(OBJS)
 	@echo ""
 	@echo "Linking $@ ..."
-	@$(CXX) -o $@ $^
+	@$(CXX) $(CFLAGS) -o $@ $^
 	@echo ""
 	@echo "....... $@ OK !..."
 	@echo ""

@@ -5,7 +5,7 @@
 #include <sys/time.h>
 #include <stdarg.h>			/*for valist */
 #include <iostream>			/*for std*/
-#include "common.h"
+#include "../common/common.h"
 // #include "user_util.h"
 
 /*---------------------------------------------------------------------
@@ -37,23 +37,23 @@ static void _print_prog_usage(char *psz_prog_name)
 {
 	printf("\n");
 	printf("Usage:\n");
-	printf("\t%s fname.bmp\n",  psz_prog_name);
+	printf("\t%s fname.bmp rgbaMask\n",  psz_prog_name);
 	printf("DESCRIPTION:\n");
-	printf("\tTransform I80 DVI BMP to I80 RAW image file...\n");
-//	printf("\tBMP_FILENAME shall specify the filename without the extension part.\n");
-	printf("\tThe program automatically generates the raw file - fname.raw.\n");
-//	printf("OPTION:\n");
-//	printf(" -w     *width* : specify width of raw image\n");
-//	printf(" -h     *height* : specify height of raw image\n");
-//	printf(" -bayer *pattern_id* : bayer pattern\n");
-//	printf("\t 1=R_GR_GB_B, 2=GR_R_B_GB, 3=B_GB_GR_R, 4=GB_B_R_GR\n");
+	printf("OPTION:\n");
+	printf(" fname.bmp : the source file path\n");
+	printf(" rgbaMask  : \"#RRGGBBAA\" color mask\n");
+	printf("     RRGGBB specify the background color (to be transparent)\n");
+	printf("     AA specify the alpha blending level\n");
 //	printf(" -b     *bits* : specify bits per pixel\n");
 //	printf(" -of    *raw_fname* : file name of output RAW image.\n");
 //	printf(" -bs    *block_hsize* : specify the hsize of do block\n");
 //	printf(" -cfg   *cfg_fname* : specify full name of cfg file\n");
+	printf("\n");
 }
 
-#define ALPHA		0x00
+#define ALPHA		0xff
+char _bgR, _bgB, _bgG, _alpha;
+
 /*---------------------------------------------------------------------
  * _reform_output_image
  */
@@ -61,7 +61,7 @@ static void _reform_output_image(FILE *fd, char *pbmp, unsigned hsize, unsigned 
 {
 	int row, col;
 	char *prgb;
-	char rawdat[4];
+	char rawdat[4], rr, gg, bb;
 
 	_assert(fd && hsize && vsize && pbmp);
 
@@ -71,13 +71,13 @@ static void _reform_output_image(FILE *fd, char *pbmp, unsigned hsize, unsigned 
 		for (col=0; col<hsize; col++) {
 			//printf("row=%d col=%d\n", row, col);
 			prgb = pbmp+(hsize*3*row + col*3);
-			rawdat[2] = *prgb;	// B
+			rr = rawdat[2] = *prgb;	// B
 			prgb++;
-			rawdat[1] = *prgb;	// G
+			gg = rawdat[1] = *prgb;	// G
 			prgb++;
-			rawdat[0] = *prgb;	// R
+			bb = rawdat[0] = *prgb;	// R
 
-			rawdat[3] = ALPHA;
+			rawdat[3] = (rr==_bgR && gg==_bgG && bb==_bgB) ? 0x00: _alpha;
  			//printf("row=%4d col=%4d, data=%4x\n", row, col, rawdat);
 //			fwrite(rawdat, sizeof(char), 3, fd);
 			fwrite(&rawdat[0], sizeof(char), 1, fd);
@@ -139,10 +139,22 @@ int main(int argc, char *argv[])
 	unsigned err;
 
 	psz_prog = argv[0];
-	if (argc<2) {
+	if (argc<3) {
 		_print_prog_usage(psz_prog);
 		exit(0);
 	}
+
+	//--- Parse background color, formatted '#RRGGBB'
+	int rr, gg, bb, aa;
+	sscanf(argv[2], "#%2x%2x%2x%2x", &rr, &gg, &bb, &aa);
+	//printf("RR= %x, GG= %x, BB= %x, AA= %x \n", rr, gg, bb, aa);
+
+	printf("Converting BMP file \'%s\' to RGBA, background=(%02X, %02X, %02X) alpha= %02X\n", argv[1], rr, gg, bb, aa);
+
+	_bgR= (char)(rr & 0xFF);
+	_bgG= (char)(gg & 0xFF);
+	_bgB= (char)(bb & 0xFF);
+	_alpha= (char)(aa & 0xFF);
 
 	/*-- open bmp file */
 	psz_fnbmp = argv[1];
@@ -162,10 +174,16 @@ int main(int argc, char *argv[])
 	printf("BMP[%s] size : %d x %d\n", psz_fnbmp, hsize, vsize);
 
 	/*-- open output file */
-	char *psz_oext = (char *)"bin";
-	char postfix[32];
-	snprintf(postfix, 32, "_%dx%d_XRGBA", hsize, vsize);
-	char *psz_ofname = prepare_file_name(psz_fnbmp, psz_oext, postfix);
+	char *psz_ofname;
+	if (argc > 3) {
+		psz_ofname = argv[3];
+	}
+	else {
+		char *psz_oext = (char *)"bin";
+		char postfix[32];
+		snprintf(postfix, 32, "_rgba%dx%d", hsize, vsize);
+		psz_ofname = prepare_file_name(psz_fnbmp, psz_oext, postfix);
+	}
 
 	fd_out = fopen(psz_ofname, "wb");
 	if (!fd_out) {
