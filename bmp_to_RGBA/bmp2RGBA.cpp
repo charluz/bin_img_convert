@@ -37,14 +37,14 @@ static void _print_prog_usage(char *psz_prog_name)
 {
 	printf("\n");
 	printf("Usage:\n");
-	printf("\t%s fname.bmp rgbaMask\n",  psz_prog_name);
+	printf("\t%s fname.bmp rgbaMask [ofname]\n",  psz_prog_name);
 	printf("DESCRIPTION:\n");
 	printf("OPTION:\n");
 	printf(" fname.bmp : the source file path\n");
 	printf(" rgbaMask  : \"#RRGGBBAA\" color mask\n");
 	printf("     RRGGBB specify the background color (to be transparent)\n");
 	printf("     AA specify the alpha blending level\n");
-//	printf(" -b     *bits* : specify bits per pixel\n");
+	printf(" ofname    : (optional) output file path\n");
 //	printf(" -of    *raw_fname* : file name of output RAW image.\n");
 //	printf(" -bs    *block_hsize* : specify the hsize of do block\n");
 //	printf(" -cfg   *cfg_fname* : specify full name of cfg file\n");
@@ -190,7 +190,6 @@ int main(int argc, char *argv[])
 		printf("FATAL: error openning RAW [%s] !\n", sz_fnraw);
 		goto _exit;
 	}
-
 
 	/*-- alloc & read BMP image */
 	imgsize = hsize*vsize*3;
